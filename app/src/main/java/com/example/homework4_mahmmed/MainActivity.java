@@ -49,17 +49,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        Fragment fragment = null;
         Intent intent = null;
+
         switch (id){
-            case R.id.nav_drafts:
-                fragment = new DraftFragment();
+            case R.id.nav_play:
+                intent = new Intent(this, PlayActivity.class);
                 break;
-            case R.id.nav_help:
-                intent = new Intent(this, HelpActivity.class);
-                startActivity(intent);
+
+            case R.id.nav_player_stats:
+                intent = new Intent(this, PlayerStatsActivity.class);
+                break;
+
+            case R.id.nav_purchase_packs:
+                intent = new Intent(this, PurchasePacksActivity.class);
+                break;
+
+            case R.id.nav_open_packs:
+                intent = new Intent(this, OpenPacksActivity.class);
+                break;
+            case R.id.nav_browse_collection:
+                intent = new Intent(this, BrowseCollectionActivity.class);
                 break;
         }
+
+        startActivity(intent);
 
 
         return false;

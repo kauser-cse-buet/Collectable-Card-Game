@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Homework4_mahmmed</string>
+    <string name="app_name">Collectable Card Game</string>
     <string name="nav_inbox">Inbox</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -10,4 +10,9 @@
     <string name="nav_drafts">Drafts</string>
     <string name="open">open</string>
     <string name="close">close</string>
+    <string name="nav_play">Play!</string>
+    <string name="nav_player_stats">Player Stats</string>
+    <string name="nav_purchase_packs">Purchase Packs</string>
+    <string name="nav_open_packs">Open Packs</string>
+    <string name="nav_browse_collection">Browse Collection</string>
 </resources>
