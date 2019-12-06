@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:orientation="vertical"
+    android:id="@+id/card_view_card_profile"
+    android:layout_margin="4dp"
+    card_view:cardElevation="2dp"
+    card_view:cardCornerRadius="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/text_card_name"
+            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_weight="2"
+            android:layout_gravity="center">
+        </TextView>
+
+        <ImageView
+            android:id="@+id/image_card"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="9"
+            android:scaleType="fitXY"
+            android:layout_gravity="center"
+            android:src="@drawable/clubs_2">
+        </ImageView>
+
+
+        <TextView
+            android:id="@+id/text_card_price"
+            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:layout_marginBottom="5dp">
+        </TextView>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

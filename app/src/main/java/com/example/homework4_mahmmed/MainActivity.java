@@ -7,11 +7,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -24,10 +26,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Fragment fragment = new InboxFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.content_frame, fragment);
-        ft.commit();
+//        FrameLayout contentFrameLayout = (FrameLayout) findViewById(R.id.content_frame); //Remember this is the FrameLayout area within your activity_main.xml
+//        getLayoutInflater().inflate(R.layout.fragment_cards, contentFrameLayout);
+
+
+
+//        Fragment fragment = new InboxFragment();
+//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//        ft.add(R.id.content_frame, fragment);
+//        ft.commit();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -45,7 +52,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        CustomDatabaseHelper customDatabaseHelper = new CustomDatabaseHelper(this);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        CardsFragment cardsFragment = new CardsFragment();
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        fragmentTransaction.replace(R.id.content_frame, cardsFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
     }
 
     @Override
