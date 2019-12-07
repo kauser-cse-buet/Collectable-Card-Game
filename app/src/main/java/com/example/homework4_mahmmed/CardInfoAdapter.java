@@ -41,13 +41,13 @@ public class CardInfoAdapter extends RecyclerView.Adapter<CardInfoAdapter.ViewHo
         Card card = cardList.get(position);
 
         ImageView cardImage= (ImageView) cardView.findViewById(R.id.image_card);
-        cardImage.setImageResource(card.getCardImageResourceId());
+        cardImage.setImageResource(card.getImageResourceId());
 
         TextView cardNameTextView = (TextView) cardView.findViewById(R.id.text_card_name);
-        cardNameTextView.setText(card.getCardName());
+        cardNameTextView.setText(card.getName());
 
         TextView cardPriceTextView = (TextView) cardView.findViewById(R.id.text_card_price);
-        cardPriceTextView.setText("Price: " + card.getCardPrice());
+        cardPriceTextView.setText("Price: " + card.getPrice());
     }
 
     @Override

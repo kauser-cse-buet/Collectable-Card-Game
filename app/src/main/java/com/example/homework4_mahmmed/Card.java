@@ -1,13 +1,10 @@
 package com.example.homework4_mahmmed;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 public class Card {
-    private int cardId;
-    private String cardName;
-    private int cardPrice;
-    private int cardImageResourceId;
+    private int id;
+    private String name;
+    private int price;
+    private int imageResourceId;
 
     public static final Card[] cards = new Card[]{
             new Card("2 of hearts", 20, R.drawable.hearts_2),
@@ -68,40 +65,40 @@ public class Card {
     }
 
     public Card(String cardName, int cardPrice, int cardImageResourceId){
-        this.cardName = cardName;
-        this.cardPrice = cardPrice;
-        this.cardImageResourceId = cardImageResourceId;
+        this.name = cardName;
+        this.price = cardPrice;
+        this.imageResourceId = cardImageResourceId;
     }
 
-    public int getCardId() {
-        return cardId;
+    public int getId() {
+        return id;
     }
 
-    public String getCardName() {
-        return cardName;
+    public String getName() {
+        return name;
     }
 
-    public int getCardPrice() {
-        return cardPrice;
+    public int getPrice() {
+        return price;
     }
 
-    public int getCardImageResourceId() {
-        return cardImageResourceId;
+    public int getImageResourceId() {
+        return imageResourceId;
     }
 
-    public void setCardId(int cardId) {
-        this.cardId = cardId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setCardName(String cardName) {
-        this.cardName = cardName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setCardImageResourceId(int cardImageResourceId) {
-        this.cardImageResourceId = cardImageResourceId;
+    public void setImageResourceId(int imageResourceId) {
+        this.imageResourceId = imageResourceId;
     }
 
-    public void setCardPrice(int cardPrice) {
-        this.cardPrice = cardPrice;
+    public void setPrice(int price) {
+        this.price = price;
     }
 }

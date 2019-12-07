@@ -7,8 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -50,10 +48,10 @@ public class CardsFragment extends Fragment {
                     while(c.moveToNext()){
                         Card card = new Card();
 
-                        card.setCardId(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_ID)));
-                        card.setCardName(c.getString(c.getColumnIndex(helper.CARD_COLUMN_NAME)));
-                        card.setCardPrice(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_PRICE)));
-                        card.setCardImageResourceId(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_IMAGE_RESOURCE_ID)));
+                        card.setId(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_ID)));
+                        card.setName(c.getString(c.getColumnIndex(helper.CARD_COLUMN_NAME)));
+                        card.setPrice(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_PRICE)));
+                        card.setImageResourceId(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_IMAGE_RESOURCE_ID)));
 
                         cardList.add(card);
                     }
@@ -61,9 +59,9 @@ public class CardsFragment extends Fragment {
                 else{
 
                     for(Card baseCard: Card.cards){
-                        long id = helper.insertCard(db, baseCard.getCardName(), baseCard.getCardPrice(), baseCard.getCardImageResourceId());
-                        Card card = new Card(baseCard.getCardName(), baseCard.getCardPrice(), baseCard.getCardImageResourceId());
-                        card.setCardId((int)id);
+                        long id = helper.insertCard(db, baseCard.getName(), baseCard.getPrice(), baseCard.getImageResourceId());
+                        Card card = new Card(baseCard.getName(), baseCard.getPrice(), baseCard.getImageResourceId());
+                        card.setId((int)id);
                         cardList.add(card);
                     }
                 }
@@ -104,12 +102,12 @@ public class CardsFragment extends Fragment {
 //
 //        List<Card> cards  = new ArrayList<>();
 //        for(Card card: Card.cards){
-//            long id = helper.insertCard(db, card.getCardName(), card.getCardPrice(), card.getCardImageResourceId());
+//            long id = helper.insertCard(db, card.getName(), card.getPrice(), card.getImageResourceId());
 //
 //
 //            cards.add(card);
 //
-//            card.setCardId((int)id);
+//            card.setId((int)id);
 //        }
 //    }
 

@@ -26,6 +26,17 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
     public static final String PLAYER_COLUMN_NAME = "NAME";
     public static final String PLAYER_COLUMN_MONEY= "MONEY";
 
+    private static final String PLAYER_UNOPENED_PACKS_TABLE = "PLAYER_UNOPENED_PACKS";
+    public static final String PLAYER_UNOPENED_PACKS_COLUMN_ID = "_id";
+    public static final String PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID = "player_id";
+    public static final String PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID = "card_id";
+
+    private static final String PLAYER_OPENED_PACKS_TABLE = "PLAYER_OPENED_PACKS";
+    public static final String PLAYER_OPENED_PACKS_COLUMN_ID = "_id";
+    public static final String PLAYER_OPENED_PACKS_COLUMN_PLAYER_ID = "player_id";
+    public static final String PLAYER_OPENED_PACKS_COLUMN_CARD_ID = "card_id";
+
+
 
     public CustomDatabaseHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -33,7 +44,7 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query =  "CREATE TABLE "  + CARD_TABLE_NAME + " (" +
+        String query =  "CREATE TABLE IF NOT EXISTS "  + CARD_TABLE_NAME + " (" +
                 CARD_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 CARD_COLUMN_NAME + " TEXT, " +
                 CARD_COLUMN_PRICE + " INTEGER, " +
@@ -42,12 +53,33 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
         // create player
         db.execSQL(query);
 
-        query = "CREATE TABLE "  + PLAYER_TABLE_NAME + " (" +
+        query = "CREATE TABLE IF NOT EXISTS "  + PLAYER_TABLE_NAME + " (" +
                 PLAYER_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 PLAYER_COLUMN_NAME + " TEXT, " +
                 PLAYER_COLUMN_MONEY + " INTEGER);";
 
         db.execSQL(query);
+
+        query = "CREATE TABLE IF NOT EXISTS "  + PLAYER_UNOPENED_PACKS_TABLE + " (" +
+                PLAYER_UNOPENED_PACKS_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID + " INTEGER, " +
+                PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID + " INTEGER," +
+                " FOREIGN KEY(" + PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID + ") REFERENCES " + PLAYER_TABLE_NAME + "(" + PLAYER_COLUMN_ID + ")," +
+                " FOREIGN KEY(" + PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID + ") REFERENCES " + CARD_TABLE_NAME + "(" + CARD_COLUMN_ID + ")" +
+                ");";
+
+        db.execSQL(query);
+
+        query = "CREATE TABLE IF NOT EXISTS "  + PLAYER_OPENED_PACKS_TABLE + " (" +
+                PLAYER_OPENED_PACKS_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                PLAYER_OPENED_PACKS_COLUMN_PLAYER_ID + " INTEGER, " +
+                PLAYER_OPENED_PACKS_COLUMN_CARD_ID + " INTEGER," +
+                " FOREIGN KEY(" + PLAYER_OPENED_PACKS_COLUMN_PLAYER_ID + ") REFERENCES " + PLAYER_TABLE_NAME + "(" + PLAYER_COLUMN_ID + ")," +
+                " FOREIGN KEY(" + PLAYER_OPENED_PACKS_COLUMN_CARD_ID + ") REFERENCES " + CARD_TABLE_NAME + "(" + CARD_COLUMN_ID + ")" +
+                ");";
+
+        db.execSQL(query);
+
 
         ContentValues playerValues = new ContentValues();
         playerValues.put(PLAYER_COLUMN_NAME, Player.players[0].getName());
@@ -130,5 +162,84 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
         }
 
         return p;
+    }
+
+//    public getPlayerUnopenedPacks(SQLiteDatabase db, Player player){
+//
+//
+//    }
+
+    public int updatePlayer(SQLiteDatabase db, Player player){
+        ContentValues playerValues = new ContentValues();
+        playerValues.put(PLAYER_COLUMN_NAME, player.getName());
+        playerValues.put(PLAYER_COLUMN_MONEY, player.getMoney());
+
+        String whereClause = "_id = ?";
+        String[] whereArgs = new String[]{
+            player.get_id() + ""
+        };
+
+        int numberOfRowsAffected = db.update(PLAYER_TABLE_NAME, playerValues, whereClause, whereArgs);
+
+        return numberOfRowsAffected;
+    }
+
+    public long insertIntoPlayerUnopenedCard(SQLiteDatabase db, Player player, Card card) {
+        ContentValues playerUnopenedPacksValues = new ContentValues();
+        playerUnopenedPacksValues.put(PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID, player.get_id());
+        playerUnopenedPacksValues.put(PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID, card.getId());
+
+        return db.insert(PLAYER_UNOPENED_PACKS_TABLE, null, playerUnopenedPacksValues);
+    }
+
+    public void deleteFromPlayerUnopenedCard(SQLiteDatabase db, Player player, Card card) {
+        String query = "DELETE FROM " + PLAYER_UNOPENED_PACKS_TABLE +
+                        "WHERE " + PLAYER_UNOPENED_PACKS_COLUMN_ID + " in (select " + PLAYER_UNOPENED_PACKS_COLUMN_ID +
+                        "   FROM " + PLAYER_UNOPENED_PACKS_TABLE +
+                        "   WHERE " + PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID + " = " + Integer.toString(player.get_id()) + " and " + PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID + " = " + Integer.toString(card.getId()) +
+                        "   ORDER BY " + PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID +
+                        "   LIMIT 1);";
+
+        db.execSQL(query);
+    }
+
+    public long insertIntoPlayerOpenedCard(SQLiteDatabase db, Player player, Card card) {
+        ContentValues playerOpenedPacksValues = new ContentValues();
+        playerOpenedPacksValues.put(PLAYER_OPENED_PACKS_COLUMN_PLAYER_ID, player.get_id());
+        playerOpenedPacksValues.put(PLAYER_OPENED_PACKS_COLUMN_CARD_ID, card.getId());
+
+        return db.insert(PLAYER_UNOPENED_PACKS_TABLE, null, playerOpenedPacksValues);
+    }
+
+    public boolean buyPacks(SQLiteDatabase db, Player player, Card card){
+        int playerMoney = player.getMoney();
+        int cardPrice = card.getPrice();
+
+        if (playerMoney < cardPrice){
+            return false;
+        }
+        else{
+            updatePlayer(db, player);
+            insertIntoPlayerUnopenedCard(db, player, card);
+
+            int availableMoney = playerMoney - cardPrice;
+            player.setMoney(availableMoney);
+            player.unopenedCards.add(card);
+            return true;
+        }
+    }
+
+    public boolean openPacks(SQLiteDatabase db, Player player, Card card){
+        if(player.unopenedCards.contains(card)){
+            player.unopenedCards.remove(card);
+            deleteFromPlayerUnopenedCard(db, player, card);
+
+            player.openedCards.add(card);
+            insertIntoPlayerOpenedCard(db, player, card);
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }

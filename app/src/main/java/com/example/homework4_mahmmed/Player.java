@@ -1,13 +1,14 @@
 package com.example.homework4_mahmmed;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
     private int _id;
     private String name;
     private int money;
-    private List<Card> unopenedCards;
-    private List<Card> openedCards;
+    public List<Card> unopenedCards;
+    public List<Card> openedCards;
 
     public static final Player[] players = new Player[]{
             new Player("kauser", 1000)
@@ -20,6 +21,8 @@ public class Player {
     public Player(String name, int money) {
         this.name = name;
         this.money = money;
+        unopenedCards = new ArrayList<>();
+        openedCards = new ArrayList<>();
     }
 
     public String getName() {

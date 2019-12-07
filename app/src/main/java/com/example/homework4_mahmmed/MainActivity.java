@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -36,21 +38,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        ft.add(R.id.content_frame, fragment);
 //        ft.commit();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//
+//        DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawyer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this,
+//                drawer,
+//                toolbar,
+//                R.string.open,
+//                R.string.close
+//        );
+//        drawer.addDrawerListener(toggle);
+//        toggle.syncState();
+//
+//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+//        navigationView.setNavigationItemSelectedListener(this);
 
-        DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawyer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this,
-                drawer,
-                toolbar,
-                R.string.open,
-                R.string.close
-        );
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        addNavigationDrawer(this, this);
 
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -64,33 +68,59 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    public void addNavigationDrawer(NavigationView.OnNavigationItemSelectedListener listener, Activity activity){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawyer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                activity,
+                drawer,
+                toolbar,
+                R.string.open,
+                R.string.close
+        );
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        navigationView.setNavigationItemSelectedListener(listener);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        Intent intent = null;
+        Fragment fragment = null;
 
         switch (id){
             case R.id.nav_play:
-                intent = new Intent(this, PlayActivity.class);
+                fragment = new PlayFragment();
                 break;
 
+
             case R.id.nav_player_stats:
-                intent = new Intent(this, PlayerStatsActivity.class);
+                fragment = new PlayerStatsFragment();
                 break;
 
             case R.id.nav_purchase_packs:
-                intent = new Intent(this, PurchasePacksActivity.class);
+                fragment = new PurchasePacksFragment();
                 break;
 
             case R.id.nav_open_packs:
-                intent = new Intent(this, OpenPacksActivity.class);
+                fragment = new OpenPacksFragment();
                 break;
             case R.id.nav_browse_collection:
-                intent = new Intent(this, BrowseCollectionActivity.class);
+                fragment = new BrowseCollectionFragment();
                 break;
         }
 
-        startActivity(intent);
+//        startActivity(fragment);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        fragmentTransaction.replace(R.id.content_frame, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
 
 
         return false;
