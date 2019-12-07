@@ -2,6 +2,7 @@ package com.example.homework4_mahmmed;
 
 
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
@@ -11,9 +12,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,34 +40,41 @@ public class CardsFragment extends Fragment {
         helper = new CustomDatabaseHelper(getContext());
 
         if (cardList == null){
-            db = helper.getWritableDatabase();
-            Cursor c = helper.getCards(db);
+            try {
+                db = helper.getWritableDatabase();
+                Cursor c = helper.getCards(db);
 
-            cardList = new ArrayList<>();
+                cardList = new ArrayList<>();
 
-            if(c.getCount() > 0){
-                while(c.moveToNext()){
-                    Card card = new Card();
+                if(c.getCount() > 0){
+                    while(c.moveToNext()){
+                        Card card = new Card();
 
-                    card.setCardId(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_ID)));
-                    card.setCardName(c.getString(c.getColumnIndex(helper.CARD_COLUMN_NAME)));
-                    card.setCardPrice(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_PRICE)));
-                    card.setCardImageResourceId(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_IMAGE_RESOURCE_ID)));
+                        card.setCardId(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_ID)));
+                        card.setCardName(c.getString(c.getColumnIndex(helper.CARD_COLUMN_NAME)));
+                        card.setCardPrice(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_PRICE)));
+                        card.setCardImageResourceId(c.getInt(c.getColumnIndex(helper.CARD_COLUMN_IMAGE_RESOURCE_ID)));
 
-                    cardList.add(card);
+                        cardList.add(card);
+                    }
                 }
-            }
-            else{
+                else{
 
-                for(Card baseCard: Card.cards){
-                    long id = helper.insertCard(db, baseCard.getCardName(), baseCard.getCardPrice(), baseCard.getCardImageResourceId());
-                    Card card = new Card(baseCard.getCardName(), baseCard.getCardPrice(), baseCard.getCardImageResourceId());
-                    card.setCardId((int)id);
-                    cardList.add(card);
+                    for(Card baseCard: Card.cards){
+                        long id = helper.insertCard(db, baseCard.getCardName(), baseCard.getCardPrice(), baseCard.getCardImageResourceId());
+                        Card card = new Card(baseCard.getCardName(), baseCard.getCardPrice(), baseCard.getCardImageResourceId());
+                        card.setCardId((int)id);
+                        cardList.add(card);
+                    }
                 }
+
+                db.close();
+            }
+            catch (SQLException e){
+                Toast.makeText(getContext(), "Database unavilable.", Toast.LENGTH_SHORT).show();
+                Log.d("Exception: DB N/A", e.getStackTrace().toString());
             }
 
-            db.close();
         }
 
         return cardList;
@@ -86,19 +96,22 @@ public class CardsFragment extends Fragment {
         return cardRecycler;
     }
 
-    public void addAllCards(){
-        db = helper.getWritableDatabase();
-
-        List<Card> cards  = new ArrayList<>();
-        for(Card card: Card.cards){
-            long id = helper.insertCard(db, card.getCardName(), card.getCardPrice(), card.getCardImageResourceId());
-
-
-            cards.add(card);
-
-            card.setCardId((int)id);
-        }
-    }
+//    public void addAllCards(){
+//        try {
+//
+//        }
+//        db = helper.getWritableDatabase();
+//
+//        List<Card> cards  = new ArrayList<>();
+//        for(Card card: Card.cards){
+//            long id = helper.insertCard(db, card.getCardName(), card.getCardPrice(), card.getCardImageResourceId());
+//
+//
+//            cards.add(card);
+//
+//            card.setCardId((int)id);
+//        }
+//    }
 
 
 }

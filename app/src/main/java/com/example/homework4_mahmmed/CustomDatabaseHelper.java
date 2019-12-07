@@ -1,6 +1,5 @@
 package com.example.homework4_mahmmed;
 
-import android.app.DownloadManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomDatabaseHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "card_collection_game";
@@ -48,8 +50,8 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(query);
 
         ContentValues playerValues = new ContentValues();
-        playerValues.put(PLAYER_COLUMN_NAME, "Kauser");
-        playerValues.put(PLAYER_COLUMN_MONEY, 1000);
+        playerValues.put(PLAYER_COLUMN_NAME, Player.players[0].getName());
+        playerValues.put(PLAYER_COLUMN_MONEY, Player.players[0].getMoney());
 
         db.insert(PLAYER_TABLE_NAME, null, playerValues);
     }
@@ -86,5 +88,47 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
     public Cursor getPlayers(SQLiteDatabase db){
         Cursor c = db.rawQuery("SELECT * FROM " + PLAYER_COLUMN_NAME, null);
         return c;
+    }
+
+    public Player getPlayerByName(SQLiteDatabase db, String name) {
+//        ContentValues playerValues = new ContentValues();
+//        playerValues.put(PLAYER_COLUMN_NAME, name);
+//        playerValues.put(PLAYER_COLUMN_MONEY, money);
+//
+//        return db.insert(PLAYER_TABLE_NAME, null, playerValues);
+        Player p = null;
+
+        Cursor cursor = db.query(PLAYER_TABLE_NAME,
+                new String[]{PLAYER_COLUMN_ID, PLAYER_COLUMN_NAME, PLAYER_COLUMN_MONEY},
+                PLAYER_COLUMN_NAME + " = ?",
+                new String[]{name},
+                null,
+                null,
+                null
+                );
+
+        List<Player> players = new ArrayList<>();
+
+        if(cursor.getCount() > 0){
+            while(cursor.moveToNext()){
+                Player player = new Player();
+
+                int p_id = cursor.getInt(cursor.getColumnIndex(this.PLAYER_COLUMN_ID));
+                String p_name = cursor.getString(cursor.getColumnIndex(this.PLAYER_COLUMN_NAME));
+                int p_money = cursor.getInt(cursor.getColumnIndex(this.PLAYER_COLUMN_MONEY));
+
+                player.set_id(p_id);
+                player.setName(p_name);
+                player.setMoney(p_money);
+
+                players.add(player);
+            }
+        }
+
+        if(players.size() > 0){
+            p = players.get(0);
+        }
+
+        return p;
     }
 }

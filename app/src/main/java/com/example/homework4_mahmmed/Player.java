@@ -3,17 +3,27 @@ package com.example.homework4_mahmmed;
 import java.util.List;
 
 public class Player {
-    private String playerName;
+    private int _id;
+    private String name;
     private int money;
     private List<Card> unopenedCards;
     private List<Card> openedCards;
+
+    public static final Player[] players = new Player[]{
+            new Player("kauser", 1000)
+    };
 
     public Player(){
 
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public Player(String name, int money) {
+        this.name = name;
+        this.money = money;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getMoney() {
@@ -28,8 +38,12 @@ public class Player {
         return unopenedCards;
     }
 
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int get_id() {
+        return _id;
     }
 
     public void setMoney(int money) {
@@ -42,5 +56,9 @@ public class Player {
 
     public void setUnopenedCards(List<Card> unopenedCards) {
         this.unopenedCards = unopenedCards;
+    }
+
+    public void set_id(int _id) {
+        this._id = _id;
     }
 }
