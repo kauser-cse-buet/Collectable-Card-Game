@@ -42,34 +42,11 @@
                 android:layout_centerHorizontal="true">
             </ImageView>
         </androidx.cardview.widget.CardView>
-
-
     </FrameLayout>
 
-
-
-
-    <TextView
-        android:id="@+id/text_player_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="32sp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:gravity="center">
-    </TextView>
-
-
-    <TextView
-        android:id="@+id/text_player_money"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:drawableStart="@drawable/ic_monetization_on_black_24dp"
-        android:gravity="center_vertical"
-        android:layout_gravity="center">
-    </TextView>
-
+    <include
+        layout="@layout/shared_player_info">
+    </include>
 
 
 

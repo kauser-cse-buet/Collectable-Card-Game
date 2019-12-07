@@ -16,8 +16,11 @@ import android.widget.TextView;
 public class OpenPacksFragment extends Fragment {
 
 
-    public OpenPacksFragment() {
+    private final Player player;
+
+    public OpenPacksFragment(Player player) {
         // Required empty public constructor
+        this.player = player;
     }
 
 

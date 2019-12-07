@@ -17,8 +17,11 @@ import android.widget.TextView;
 public class PlayFragment extends Fragment {
 
 
-    public PlayFragment() {
+    private final Player player;
+
+    public PlayFragment(Player player) {
         // Required empty public constructor
+        this.player = player;
     }
 
 

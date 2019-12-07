@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/text_player_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="32sp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:gravity="center">
+    </TextView>
+
+    <TextView
+        android:id="@+id/text_player_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_monetization_on_gold_24dp"
+        android:gravity="center_vertical"
+        android:layout_gravity="center"
+        android:layout_marginBottom="5dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/text_player_unopened_packs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_credit_card_blue_24dp"
+        android:gravity="center_vertical"
+        android:layout_gravity="center">
+    </TextView>
+</LinearLayout>

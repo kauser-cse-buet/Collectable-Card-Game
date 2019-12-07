@@ -13,15 +13,22 @@ import androidx.fragment.app.FragmentTransaction;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.List;
 import java.util.NavigableMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private Player player;
+    private List<Card> cardsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,15 +64,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         addNavigationDrawer(this, this);
 
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        CardsFragment cardsFragment = new CardsFragment();
 
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        fragmentTransaction.replace(R.id.content_frame, cardsFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        try {
+            CustomDatabaseHelper helper = new CustomDatabaseHelper(this);
+            SQLiteDatabase db = helper.getReadableDatabase();
+            player = helper.getPlayerByName(db, Player.players[0].getName());
+            cardsList = helper.getCards(db);
 
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            CardsFragment cardsFragment = new CardsFragment(cardsList);
+
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+            fragmentTransaction.replace(R.id.content_frame, cardsFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+        catch (SQLException e){
+            Toast.makeText(this, "Database not available", Toast.LENGTH_SHORT).show();
+            Log.d("DB N/A", e.getStackTrace().toString());
+        }
     }
 
     public void addNavigationDrawer(NavigationView.OnNavigationItemSelectedListener listener, Activity activity){
@@ -94,25 +113,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         switch (id){
             case R.id.nav_play:
-                fragment = new PlayFragment();
+                fragment = new PlayFragment(player);
                 break;
 
 
             case R.id.nav_player_stats:
-                fragment = new PlayerStatsFragment();
+                fragment = new PlayerStatsFragment(player);
                 break;
 
             case R.id.nav_purchase_packs:
-                fragment = new PurchasePacksFragment();
+                fragment = new PurchasePacksFragment(player, cardsList);
                 break;
 
             case R.id.nav_open_packs:
-                fragment = new OpenPacksFragment();
+                fragment = new OpenPacksFragment(player);
                 break;
             case R.id.nav_browse_collection:
-                fragment = new BrowseCollectionFragment();
+                fragment = new BrowseCollectionFragment(player);
                 break;
         }
+
+
 
 //        startActivity(fragment);
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -121,6 +142,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fragmentTransaction.replace(R.id.content_frame, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+
+        DrawerLayout drawer = findViewById(R.id.drawyer_layout);
+
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+        }
 
 
         return false;

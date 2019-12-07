@@ -86,6 +86,8 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
         playerValues.put(PLAYER_COLUMN_MONEY, Player.players[0].getMoney());
 
         db.insert(PLAYER_TABLE_NAME, null, playerValues);
+
+        insertAllCards(db);
     }
 
 
@@ -104,9 +106,24 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
         return db.insert(CARD_TABLE_NAME, null, drinkValues);
     }
 
-    public Cursor getCards(SQLiteDatabase db){
+    public List<Card> getCards(SQLiteDatabase db){
         Cursor c = db.rawQuery("SELECT * FROM " + CARD_TABLE_NAME, null);
-        return c;
+
+        List<Card> cardList = new ArrayList<>();
+
+        if(c.getCount() > 0){
+            while(c.moveToNext()){
+                Card card = new Card();
+
+                card.setId(c.getInt(c.getColumnIndex(CARD_COLUMN_ID)));
+                card.setName(c.getString(c.getColumnIndex(CARD_COLUMN_NAME)));
+                card.setPrice(c.getInt(c.getColumnIndex(CARD_COLUMN_PRICE)));
+                card.setImageResourceId(c.getInt(c.getColumnIndex(CARD_COLUMN_IMAGE_RESOURCE_ID)));
+
+                cardList.add(card);
+            }
+        }
+        return cardList;
     }
 
     public long insertPlayer(SQLiteDatabase db, String name, int money) {
@@ -123,11 +140,6 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Player getPlayerByName(SQLiteDatabase db, String name) {
-//        ContentValues playerValues = new ContentValues();
-//        playerValues.put(PLAYER_COLUMN_NAME, name);
-//        playerValues.put(PLAYER_COLUMN_MONEY, money);
-//
-//        return db.insert(PLAYER_TABLE_NAME, null, playerValues);
         Player p = null;
 
         Cursor cursor = db.query(PLAYER_TABLE_NAME,
@@ -136,7 +148,8 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
                 new String[]{name},
                 null,
                 null,
-                null
+                null,
+                "1"
                 );
 
         List<Player> players = new ArrayList<>();
@@ -161,13 +174,51 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
             p = players.get(0);
         }
 
+        List<Card> cardList = getUnopenedPacksOfPlayer(db, p);
+        p.setUnopenedCards(cardList);
+
         return p;
     }
 
-//    public getPlayerUnopenedPacks(SQLiteDatabase db, Player player){
-//
-//
-//    }
+    public List<Card> getUnopenedPacksOfPlayer(SQLiteDatabase db, Player player){
+        String query = "SELECT " +
+                                PLAYER_UNOPENED_PACKS_TABLE + "." + PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID + ", " +
+                                CARD_TABLE_NAME + "." + CARD_COLUMN_NAME + ", " +
+                                CARD_TABLE_NAME + "." + CARD_COLUMN_PRICE + ", " +
+                                CARD_TABLE_NAME + "." + CARD_COLUMN_IMAGE_RESOURCE_ID +
+                        " FROM " + PLAYER_UNOPENED_PACKS_TABLE +
+                        " INNER JOIN " + CARD_TABLE_NAME +
+                        " ON " + PLAYER_UNOPENED_PACKS_TABLE + "." + PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID + " = " + CARD_TABLE_NAME + "." + CARD_COLUMN_ID +
+                        " WHERE " + PLAYER_UNOPENED_PACKS_TABLE + "." + PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID + " = ?;";
+
+        String[] queryArgs = new String[]{
+                Integer.toString(player.get_id())
+        };
+
+        Cursor cursor = db.rawQuery(query, queryArgs);
+        List<Card> cardList = new ArrayList<>();
+
+        if(cursor.getCount() > 0){
+            while(cursor.moveToNext()){
+                Card card = new Card();
+
+                int id = cursor.getInt(cursor.getColumnIndex(PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID));
+                String name = cursor.getString(cursor.getColumnIndex(CARD_COLUMN_NAME));
+                int price = cursor.getInt(cursor.getColumnIndex(CARD_COLUMN_PRICE));
+                int imageResourceId = cursor.getInt(cursor.getColumnIndex(CARD_COLUMN_IMAGE_RESOURCE_ID));
+
+                card.setId(id);
+                card.setName(name);
+                card.setPrice(price);
+                card.setImageResourceId(imageResourceId);
+
+
+                cardList.add(card);
+            }
+        }
+
+        return cardList;
+    }
 
     public int updatePlayer(SQLiteDatabase db, Player player){
         ContentValues playerValues = new ContentValues();
@@ -219,12 +270,15 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
             return false;
         }
         else{
-            updatePlayer(db, player);
-            insertIntoPlayerUnopenedCard(db, player, card);
+
 
             int availableMoney = playerMoney - cardPrice;
             player.setMoney(availableMoney);
             player.unopenedCards.add(card);
+
+            updatePlayer(db, player);
+            insertIntoPlayerUnopenedCard(db, player, card);
+
             return true;
         }
     }
@@ -240,6 +294,12 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
         }
         else{
             return false;
+        }
+    }
+
+    public void insertAllCards(SQLiteDatabase db){
+        for(Card card: Card.cards){
+            long id = insertCard(db, card.getName(), card.getPrice(), card.getImageResourceId());
         }
     }
 }

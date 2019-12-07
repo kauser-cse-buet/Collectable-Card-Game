@@ -21,8 +21,11 @@ import android.widget.Toast;
 public class PlayerStatsFragment extends Fragment {
 
 
-    public PlayerStatsFragment() {
+    private final Player player;
+
+    public PlayerStatsFragment(Player player) {
         // Required empty public constructor
+        this.player = player;
     }
 
 
@@ -36,27 +39,11 @@ public class PlayerStatsFragment extends Fragment {
 
         TextView playerNameTextView = (TextView) view.findViewById(R.id.text_player_name);
         TextView playerMoneyTextView = (TextView) view.findViewById(R.id.text_player_money);
+        TextView playerUnopenedTextView = (TextView) view.findViewById(R.id.text_player_unopened_packs);
 
-
-        try {
-            CustomDatabaseHelper helper = new CustomDatabaseHelper(view.getContext());
-            SQLiteDatabase db = helper.getReadableDatabase();
-
-            Player player = helper.getPlayerByName(db, Player.players[0].getName());
-
-//            if (player != null){
-            playerNameTextView.setText(player.getName());
-            playerMoneyTextView.setText("Available Money: " + player.getMoney());
-
-//            }
-            db.close();
-
-
-        }
-        catch (SQLException e){
-            Toast.makeText(view.getContext(), "Database not available", Toast.LENGTH_SHORT).show();
-            Log.d("DB N/A", e.getStackTrace().toString());
-        }
+        playerNameTextView.setText(player.getName());
+        playerMoneyTextView.setText("Current Gold: " + player.getMoney());
+        playerUnopenedTextView.setText("Number of Packs: " + player.unopenedCards.size());
 
         return view;
     }

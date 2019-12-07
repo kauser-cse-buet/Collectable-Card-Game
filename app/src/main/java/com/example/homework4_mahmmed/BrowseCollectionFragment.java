@@ -17,8 +17,11 @@ import android.widget.TextView;
 public class BrowseCollectionFragment extends Fragment {
 
 
-    public BrowseCollectionFragment() {
+    private final Player player;
+
+    public BrowseCollectionFragment(Player player) {
         // Required empty public constructor
+        this.player = player;
     }
 
 
