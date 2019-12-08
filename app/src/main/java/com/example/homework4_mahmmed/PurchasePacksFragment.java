@@ -129,7 +129,9 @@ public class PurchasePacksFragment extends Fragment implements CardInfoAdapter.O
                                     CustomDatabaseHelper helper = new CustomDatabaseHelper(getContext());
                                     SQLiteDatabase db = helper.getWritableDatabase();
 
-                                    boolean success = helper.buyPacks(db, player, cardList.get(position));
+                                    Card card = cardList.get(position);
+
+                                    boolean success = helper.buyPacks(db, player, card);
 
                                     Log.d(TAG, success + ", " + player.getMoney() + ", " + player.unopenedCards.size());
 
@@ -139,6 +141,11 @@ public class PurchasePacksFragment extends Fragment implements CardInfoAdapter.O
 
                                         TextView textViewMoney = (TextView) getActivity().findViewById(R.id.text_player_money);
                                         textViewMoney.setText("Current Gold: " + player.getMoney());
+
+                                        Toast.makeText(getContext(), "You have successfully bought " + card.getName() + ".", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        Toast.makeText(getContext(), "Sorry!!! you cannot buy " + card.getName() + " now.", Toast.LENGTH_SHORT).show();
                                     }
 
                                     LinearLayout buttonRecyclerViewContainer = (LinearLayout)getActivity().findViewById(R.id.button_recycler_view_container);

@@ -9,21 +9,24 @@ public class Player {
     private int money;
     public List<Card> unopenedCards;
     public List<Card> openedCards;
+    private List<Deck> deckList;
 
     public static final Player[] players = new Player[]{
             new Player("kauser", 1000)
     };
 
     public Player(){
-        unopenedCards = new ArrayList<>();
-        openedCards = new ArrayList<>();
+        this.unopenedCards = new ArrayList<>();
+        this.openedCards = new ArrayList<>();
+        this.deckList = new ArrayList<>();
     }
 
     public Player(String name, int money) {
         this.name = name;
         this.money = money;
-        unopenedCards = new ArrayList<>();
-        openedCards = new ArrayList<>();
+        this.unopenedCards = new ArrayList<>();
+        this.openedCards = new ArrayList<>();
+        this.deckList = new ArrayList<>();
     }
 
     public String getName() {
@@ -64,5 +67,13 @@ public class Player {
 
     public void set_id(int _id) {
         this._id = _id;
+    }
+
+    public List<Deck> getDeckList() {
+        return deckList;
+    }
+
+    public void setDeckList(List<Deck> deckList) {
+        this.deckList = deckList;
     }
 }

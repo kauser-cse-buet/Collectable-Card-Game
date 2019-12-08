@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -97,6 +98,7 @@ public class OpenPacksFragment extends Fragment implements CardInfoAdapter.OnNot
                                 TextView textViewUnopenedPacks = (TextView) getActivity().findViewById(R.id.text_player_unopened_packs);
                                 textViewUnopenedPacks.setText("Number of Packs: " + player.unopenedCards.size());
                                 cardInfoAdapter.notifyDataSetChanged();
+                                Toast.makeText(getContext(), "Successfully opened " + card.getName() + " and added to your collection.", Toast.LENGTH_SHORT).show();
                             }
 
                         }
