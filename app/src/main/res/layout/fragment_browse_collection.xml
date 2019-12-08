@@ -10,4 +10,8 @@
         layout="@layout/shared_fragment_header">
     </include>
 
+    <include
+        layout="@layout/opened_pack_list">
+    </include>
+
 </LinearLayout>

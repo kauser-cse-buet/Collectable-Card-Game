@@ -174,8 +174,10 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
             p = players.get(0);
         }
 
-        List<Card> cardList = getUnopenedPacksOfPlayer(db, p);
-        p.setUnopenedCards(cardList);
+        List<Card> unopenedPacksOfPlayer = getUnopenedPacksOfPlayer(db, p);
+        List<Card> openedPacksOfPlayer = getOpenedPacksOfPlayer(db, p);
+        p.setUnopenedCards(unopenedPacksOfPlayer);
+        p.setOpenedCards(openedPacksOfPlayer);
 
         return p;
     }
@@ -220,6 +222,46 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
         return cardList;
     }
 
+    public List<Card> getOpenedPacksOfPlayer(SQLiteDatabase db, Player player){
+        String query = "SELECT " +
+                PLAYER_OPENED_PACKS_TABLE + "." + PLAYER_OPENED_PACKS_COLUMN_CARD_ID + ", " +
+                CARD_TABLE_NAME + "." + CARD_COLUMN_NAME + ", " +
+                CARD_TABLE_NAME + "." + CARD_COLUMN_PRICE + ", " +
+                CARD_TABLE_NAME + "." + CARD_COLUMN_IMAGE_RESOURCE_ID +
+                " FROM " + PLAYER_OPENED_PACKS_TABLE +
+                " INNER JOIN " + CARD_TABLE_NAME +
+                " ON " + PLAYER_OPENED_PACKS_TABLE + "." + PLAYER_OPENED_PACKS_COLUMN_CARD_ID + " = " + CARD_TABLE_NAME + "." + CARD_COLUMN_ID +
+                " WHERE " + PLAYER_OPENED_PACKS_TABLE + "." + PLAYER_OPENED_PACKS_COLUMN_PLAYER_ID + " = ?;";
+
+        String[] queryArgs = new String[]{
+                Integer.toString(player.get_id())
+        };
+
+        Cursor cursor = db.rawQuery(query, queryArgs);
+        List<Card> cardList = new ArrayList<>();
+
+        if(cursor.getCount() > 0){
+            while(cursor.moveToNext()){
+                Card card = new Card();
+
+                int id = cursor.getInt(cursor.getColumnIndex(PLAYER_OPENED_PACKS_COLUMN_CARD_ID));
+                String name = cursor.getString(cursor.getColumnIndex(CARD_COLUMN_NAME));
+                int price = cursor.getInt(cursor.getColumnIndex(CARD_COLUMN_PRICE));
+                int imageResourceId = cursor.getInt(cursor.getColumnIndex(CARD_COLUMN_IMAGE_RESOURCE_ID));
+
+                card.setId(id);
+                card.setName(name);
+                card.setPrice(price);
+                card.setImageResourceId(imageResourceId);
+
+
+                cardList.add(card);
+            }
+        }
+
+        return cardList;
+    }
+
     public int updatePlayer(SQLiteDatabase db, Player player){
         ContentValues playerValues = new ContentValues();
         playerValues.put(PLAYER_COLUMN_NAME, player.getName());
@@ -245,7 +287,7 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
 
     public void deleteFromPlayerUnopenedCard(SQLiteDatabase db, Player player, Card card) {
         String query = "DELETE FROM " + PLAYER_UNOPENED_PACKS_TABLE +
-                        "WHERE " + PLAYER_UNOPENED_PACKS_COLUMN_ID + " in (select " + PLAYER_UNOPENED_PACKS_COLUMN_ID +
+                        " WHERE " + PLAYER_UNOPENED_PACKS_COLUMN_ID + " in (select " + PLAYER_UNOPENED_PACKS_COLUMN_ID +
                         "   FROM " + PLAYER_UNOPENED_PACKS_TABLE +
                         "   WHERE " + PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID + " = " + Integer.toString(player.get_id()) + " and " + PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID + " = " + Integer.toString(card.getId()) +
                         "   ORDER BY " + PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID +
@@ -259,7 +301,7 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
         playerOpenedPacksValues.put(PLAYER_OPENED_PACKS_COLUMN_PLAYER_ID, player.get_id());
         playerOpenedPacksValues.put(PLAYER_OPENED_PACKS_COLUMN_CARD_ID, card.getId());
 
-        return db.insert(PLAYER_UNOPENED_PACKS_TABLE, null, playerOpenedPacksValues);
+        return db.insert(PLAYER_OPENED_PACKS_TABLE, null, playerOpenedPacksValues);
     }
 
     public boolean buyPacks(SQLiteDatabase db, Player player, Card card){
@@ -285,11 +327,12 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
 
     public boolean openPacks(SQLiteDatabase db, Player player, Card card){
         if(player.unopenedCards.contains(card)){
-            player.unopenedCards.remove(card);
             deleteFromPlayerUnopenedCard(db, player, card);
-
-            player.openedCards.add(card);
             insertIntoPlayerOpenedCard(db, player, card);
+
+            player.unopenedCards.remove(card);
+            player.openedCards.add(card);
+
             return true;
         }
         else{
@@ -301,5 +344,49 @@ public class CustomDatabaseHelper extends SQLiteOpenHelper {
         for(Card card: Card.cards){
             long id = insertCard(db, card.getName(), card.getPrice(), card.getImageResourceId());
         }
+    }
+
+
+    public Card getCardForIdFromList(List<Card> cardList, int cardId){
+        Card card = null;
+
+        for (Card c: cardList){
+            if(c.getId() == cardId){
+                card = new Card();
+                card.setName(c.getName());
+                card.setImageResourceId(c.getImageResourceId());
+                card.setPrice(c.getPrice());
+            }
+        }
+
+        return card;
+    }
+
+    public List<Card> getUnopenPacksForPlayer(SQLiteDatabase db, Player player, List<Card> cardList){
+        List<Card> unopenPacks = new ArrayList<>();
+        List<Integer> cardIdList = new ArrayList<>();
+
+        String query = "SELECT " + PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID +
+                        " FROM " + PLAYER_UNOPENED_PACKS_TABLE +
+                        " WHERE " + PLAYER_UNOPENED_PACKS_COLUMN_PLAYER_ID + " = ?;";
+
+        String[] args = new String[]{
+                Integer.toString(player.get_id())
+        };
+
+        Cursor cursor = db.rawQuery(query, args);
+
+        if(cursor.getCount() > 0){
+            while(cursor.moveToNext()){
+                int cardId = cursor.getInt(cursor.getColumnIndex(PLAYER_UNOPENED_PACKS_COLUMN_CARD_ID));
+                Card card = getCardForIdFromList(cardList, cardId);
+                if (card != null){
+                    unopenPacks.add(card);
+                }
+
+            }
+        }
+
+        return unopenPacks;
     }
 }

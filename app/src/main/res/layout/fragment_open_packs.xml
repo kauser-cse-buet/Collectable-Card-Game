@@ -9,4 +9,12 @@
         layout="@layout/shared_fragment_header">
     </include>
 
+    <include
+        layout="@layout/shared_player_info">
+    </include>
+
+    <include
+        layout="@layout/card_recycler_view">
+    </include>
+
 </LinearLayout>

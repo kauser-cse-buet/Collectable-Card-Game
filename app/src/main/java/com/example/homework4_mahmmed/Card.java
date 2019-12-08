@@ -1,5 +1,7 @@
 package com.example.homework4_mahmmed;
 
+import java.util.List;
+
 public class Card {
     private int id;
     private String name;
@@ -100,5 +102,14 @@ public class Card {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public static Card getCardForCardId(int cardId, List<Card> cardList){
+        for (Card card: cardList){
+            if (card.getId() == cardId){
+                return card;
+            }
+        }
+        return null;
     }
 }

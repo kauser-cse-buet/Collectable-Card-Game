@@ -15,7 +15,8 @@ public class Player {
     };
 
     public Player(){
-
+        unopenedCards = new ArrayList<>();
+        openedCards = new ArrayList<>();
     }
 
     public Player(String name, int money) {
